@@ -378,7 +378,7 @@
       font-size: 13px;
     }
 
-    @media (max-width: 820px) {
+    @media screen and (max-width: 820px) {
       .page {
         width: 100%;
         margin: 0;
@@ -426,59 +426,51 @@
 
     @media print {
       @page {
-        margin: 12mm;
         size: A4;
+        margin: 8mm;
       }
 
+      * {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+
+      html,
       body {
+        width: 100%;
         background: #ffffff;
-        color: #111820;
       }
 
       .page {
         width: 100%;
+        max-width: none;
         margin: 0;
         border: 0;
         box-shadow: none;
-      }
-
-      .hero {
-        padding: 0 0 18px;
-        border-top: 0;
-        border-bottom: 2px solid var(--accent);
-        background: #ffffff;
-      }
-
-      .content {
-        padding: 20px 0 0;
-        gap: 24px;
-        grid-template-columns: 260px minmax(0, 1fr);
       }
 
       .print-button {
         display: none;
       }
 
-      .avatar {
-        width: 92px;
-        height: 92px;
-        box-shadow: none;
-        border-color: #d8e1e8;
+      h2,
+      .skill-title {
+        break-after: avoid;
+        page-break-after: avoid;
       }
 
-      section + section {
-        margin-top: 20px;
+      .skill-group {
+        break-inside: avoid;
+        page-break-inside: avoid;
       }
 
-      .timeline {
-        gap: 18px;
-      }
-
+      .hero,
+      .item,
       .project,
       .education,
       .metric {
         break-inside: avoid;
-        background: #ffffff;
+        page-break-inside: avoid;
       }
     }
   </style>
