@@ -153,22 +153,83 @@
       stroke-width: 2;
     }
 
-    .print-options {
-      display: inline-flex;
+    .export-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 20;
+      display: none;
       align-items: center;
-      gap: 7px;
-      color: var(--muted);
-      font-size: 12px;
+      justify-content: center;
+      padding: 20px;
+      background: rgba(18, 31, 43, 0.32);
+    }
+
+    .export-modal.is-open {
+      display: flex;
+    }
+
+    .export-panel {
+      width: min(360px, 100%);
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #ffffff;
+      box-shadow: 0 18px 44px rgba(23, 32, 42, 0.22);
+    }
+
+    .export-panel h2 {
+      margin: 0 0 12px;
+      color: var(--text);
+      font-size: 18px;
+      line-height: 1.3;
+    }
+
+    .export-option {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 0;
+      color: var(--text);
+      font-size: 14px;
       font-weight: 700;
       cursor: pointer;
       user-select: none;
     }
 
-    .print-options input {
-      width: 14px;
-      height: 14px;
+    .export-option input {
+      width: 16px;
+      height: 16px;
       margin: 0;
       accent-color: var(--accent);
+    }
+
+    .export-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .export-actions button {
+      min-height: 34px;
+      padding: 0 14px;
+      border-radius: 6px;
+      font: inherit;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .export-cancel {
+      border: 1px solid var(--line);
+      color: var(--muted);
+      background: #ffffff;
+    }
+
+    .export-confirm {
+      border: 1px solid var(--accent);
+      color: #ffffff;
+      background: var(--accent);
     }
 
     .resume-footer {
@@ -518,8 +579,9 @@
         display: none;
       }
 
-      .print-options {
-        display: none;
+      .export-modal,
+      .export-modal.is-open {
+        display: none !important;
       }
 
       body.with-print-footer .resume-footer {
@@ -722,7 +784,7 @@
       </div>
       <div class="avatar-wrap">
         <img class="avatar" src="assets/huang-junhao-avatar.png" alt="黄俊淏证件照">
-        <button class="print-button" type="button" onclick="window.print()" aria-label="打印或导出 PDF">
+        <button class="print-button" type="button" id="openExportPanel" aria-label="打印或导出 PDF">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
             <path d="M6 9V2h12v7"></path>
             <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
@@ -730,10 +792,6 @@
           </svg>
           导出 PDF
         </button>
-        <label class="print-options">
-          <input id="printFooterToggle" type="checkbox" aria-label="导出 PDF 时添加在线简历网址">
-          <span>添加页脚</span>
-        </label>
       </div>
     </header>
 
@@ -896,14 +954,61 @@
       在线简历：https://cosm1cac.github.io/online-resume/
     </footer>
   </article>
+  <div class="export-modal" id="exportModal" aria-hidden="true">
+    <div class="export-panel" role="dialog" aria-modal="true" aria-labelledby="export-title">
+      <h2 id="export-title">导出 PDF</h2>
+      <label class="export-option">
+        <input id="printFooterToggle" type="checkbox">
+        <span>添加页脚</span>
+      </label>
+      <div class="export-actions">
+        <button class="export-cancel" type="button" id="cancelExport">取消</button>
+        <button class="export-confirm" type="button" id="confirmExport">继续导出</button>
+      </div>
+    </div>
+  </div>
   <script>
+    const openExportPanel = document.getElementById('openExportPanel');
+    const exportModal = document.getElementById('exportModal');
     const printFooterToggle = document.getElementById('printFooterToggle');
+    const cancelExport = document.getElementById('cancelExport');
+    const confirmExport = document.getElementById('confirmExport');
 
     function syncPrintFooter() {
       document.body.classList.toggle('with-print-footer', printFooterToggle.checked);
     }
 
+    function openExportModal() {
+      exportModal.classList.add('is-open');
+      exportModal.setAttribute('aria-hidden', 'false');
+      printFooterToggle.focus();
+    }
+
+    function closeExportModal() {
+      exportModal.classList.remove('is-open');
+      exportModal.setAttribute('aria-hidden', 'true');
+      openExportPanel.focus();
+    }
+
+    openExportPanel.addEventListener('click', openExportModal);
+    cancelExport.addEventListener('click', closeExportModal);
+    exportModal.addEventListener('click', (event) => {
+      if (event.target === exportModal) {
+        closeExportModal();
+      }
+    });
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && exportModal.classList.contains('is-open')) {
+        closeExportModal();
+      }
+    });
     printFooterToggle.addEventListener('change', syncPrintFooter);
+    confirmExport.addEventListener('click', () => {
+      syncPrintFooter();
+      exportModal.classList.remove('is-open');
+      exportModal.setAttribute('aria-hidden', 'true');
+      window.print();
+    });
     window.addEventListener('beforeprint', syncPrintFooter);
     syncPrintFooter();
   </script>
