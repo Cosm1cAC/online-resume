@@ -153,6 +153,32 @@
       stroke-width: 2;
     }
 
+    .print-options {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .print-options input {
+      width: 14px;
+      height: 14px;
+      margin: 0;
+      accent-color: var(--accent);
+    }
+
+    .resume-footer {
+      display: none;
+      color: var(--muted);
+      text-align: center;
+      font-size: 10px;
+      line-height: 1.2;
+    }
+
     .content {
       display: grid;
       grid-template-columns: 308px minmax(0, 1fr);
@@ -492,10 +518,29 @@
         display: none;
       }
 
+      .print-options {
+        display: none;
+      }
+
+      body.with-print-footer .resume-footer {
+        display: block;
+        position: fixed;
+        right: 22px;
+        bottom: 2mm;
+        left: 22px;
+        margin: 0;
+        padding-top: 4px;
+        border-top: 1px solid #d9e5ea;
+      }
+
+      body.with-print-footer .content {
+        padding-bottom: 26px;
+      }
+
       .content {
         grid-template-columns: 260px minmax(0, 1fr);
-        gap: 22px;
-        padding: 18px 22px 18px;
+        gap: 20px;
+        padding: 16px 22px 14px;
       }
 
       section + section {
@@ -685,6 +730,10 @@
           </svg>
           导出 PDF
         </button>
+        <label class="print-options">
+          <input id="printFooterToggle" type="checkbox" aria-label="导出 PDF 时添加在线简历网址">
+          <span>添加页脚</span>
+        </label>
       </div>
     </header>
 
@@ -843,7 +892,21 @@
         </section>
       </main>
     </div>
+    <footer class="resume-footer">
+      在线简历：https://cosm1cac.github.io/online-resume/
+    </footer>
   </article>
+  <script>
+    const printFooterToggle = document.getElementById('printFooterToggle');
+
+    function syncPrintFooter() {
+      document.body.classList.toggle('with-print-footer', printFooterToggle.checked);
+    }
+
+    printFooterToggle.addEventListener('change', syncPrintFooter);
+    window.addEventListener('beforeprint', syncPrintFooter);
+    syncPrintFooter();
+  </script>
 </body>
 </html>
 
